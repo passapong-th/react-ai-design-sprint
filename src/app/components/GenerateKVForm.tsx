@@ -86,12 +86,14 @@ const GenerateKVForm: React.FC = () => {
               </label>
             ))}
           </form>
-          <div className="flex justify-between mt-6">
-            <Link href="/big-idea">
-              <button className="bg-[#F3F6FB] text-[#2563EB] px-8 py-2 rounded-lg font-semibold text-lg">Previous</button>
-            </Link>
-            <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg">Next</button>
-          </div>
+                <div className="flex justify-between mt-6">
+                  <Link href="/big-idea">
+                    <button className="bg-[#F3F6FB] text-[#2563EB] px-8 py-2 rounded-lg font-semibold text-lg">Previous</button>
+                  </Link>
+                  <Link href="/generate-kv-segment">
+                    <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg">Next</button>
+                  </Link>
+                </div>
         </section>
       </main>
     </div>
