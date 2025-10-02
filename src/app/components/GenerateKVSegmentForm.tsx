@@ -85,7 +85,6 @@ const GenerateKVSegmentForm: React.FC = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-[#E5E7EB] flex flex-col py-6 px-4">
         <div className="flex items-center gap-2 mb-8">
-          <img src="/ttb-logo.svg" alt="ttb Ads Generator" className="h-6" />
           <span className="font-bold text-[#1A202C] text-lg">Ads Generator</span>
         </div>
         <nav className="flex flex-col gap-2">
@@ -104,9 +103,6 @@ const GenerateKVSegmentForm: React.FC = () => {
         {/* Header */}
         <header className="flex items-center justify-between px-8 py-6 border-b border-[#E5E7EB] bg-white">
           <div className="flex items-center gap-2">
-            <Link href="/generate-kv-result">
-              <button className="text-[#2563EB] text-sm font-medium">&lt; Back</button>
-            </Link>
             <span className="text-xl font-semibold text-[#1A202C]">Generate KV</span>
           </div>
           <div className="flex items-center gap-3">
