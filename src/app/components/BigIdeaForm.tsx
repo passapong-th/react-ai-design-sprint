@@ -90,7 +90,9 @@ const BigIdeaForm: React.FC = () => {
             <Link href="/">
               <button className="bg-[#F3F6FB] text-[#2563EB] px-8 py-2 rounded-lg font-semibold text-lg">Previous</button>
             </Link>
-            <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg">Next</button>
+            <Link href="/generate-kv">
+              <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg">Next</button>
+            </Link>
           </div>
         </section>
       </main>
