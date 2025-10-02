@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const CreateCampaignForm: React.FC = () => {
   return (
@@ -184,7 +185,9 @@ const CreateCampaignForm: React.FC = () => {
               </div>
             </div>
             <div className="flex justify-end">
-              <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg">Next</button>
+              <Link href="/big-idea">
+                <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg">Next</button>
+              </Link>
             </div>
           </div>
         </section>
