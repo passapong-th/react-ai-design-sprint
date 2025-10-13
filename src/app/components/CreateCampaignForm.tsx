@@ -90,11 +90,11 @@ const CreateCampaignForm: React.FC = () => {
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Campaign name*</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2" value="โฆษณาประกันสะสมทรัพย์" readOnly />
+                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="โฆษณาประกันสะสมทรัพย์" readOnly />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Product/Service</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2" value="ประกันสะสมทรัพย์" readOnly />
+                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="ประกันสะสมทรัพย์" readOnly />
               </div>
             </div>
             <div className="flex gap-6 items-center">
@@ -189,31 +189,31 @@ const CreateCampaignForm: React.FC = () => {
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Product/Service context</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2" value="ประกัน" readOnly />
+                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="ประกัน" readOnly />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Goals & Indication</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2" value="วัดประเมินผลกับเป้าหมาย: [[Conversions|Leads|Messages|Traffic|Awareness]]" readOnly />
+                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="วัดประเมินผลกับเป้าหมาย: [[Conversions|Leads|Messages|Traffic|Awareness]]" readOnly />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">รายละเอียด sub-segment เพิ่มเติม</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2" value="20,000-50,000 / กรุงเทพฯ / มีรายงานวิดีโอ / 0-3 คน" readOnly />
+                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="20,000-50,000 / กรุงเทพฯ / มีรายงานวิดีโอ / 0-3 คน" readOnly />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Mood and tone</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2" value="โทนภาพ [เป็นกันเอง/มืออาชีพ/สนุก/พรีเมียม/จริงใจ]..." readOnly />
+                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="โทนภาพ [เป็นกันเอง/มืออาชีพ/สนุก/พรีเมียม/จริงใจ]..." readOnly />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Language</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2" value="ไทย/อังกฤษ" readOnly />
+                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="ไทย/อังกฤษ" readOnly />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Mandatory</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2" value="Human-Readable: อัดแน่นควรสื่อและสาระตรงเน้น..." readOnly />
+                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="Human-Readable: อัดแน่นควรสื่อและสาระตรงเน้น..." readOnly />
               </div>
             </div>
             <div className="mb-4">
@@ -222,7 +222,7 @@ const CreateCampaignForm: React.FC = () => {
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1 text-[#4B5563]">Insight</label>
-              <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2" placeholder="Description" readOnly />
+              <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" placeholder="Description" readOnly />
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1 text-[#4B5563]">Upload</label>

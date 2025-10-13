@@ -16,8 +16,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Set environment variable for OpenAI API Key
-ENV NEXT_PUBLIC_CHATGPT_API_KEY=""
+# Set environment variable for OpenAI API Key (can be overridden by Cloud Run)
+ENV NEXT_PUBLIC_CHATGPT_API_KEY=${NEXT_PUBLIC_CHATGPT_API_KEY}
 
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/.next ./.next
