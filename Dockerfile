@@ -25,7 +25,9 @@ COPY --from=builder /app/next-env.d.ts ./next-env.d.ts
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/postcss.config.mjs ./postcss.config.mjs
 COPY --from=builder /app/tailwind.config.js ./tailwind.config.js
+
 COPY --from=builder /app/eslint.config.mjs ./eslint.config.mjs
+COPY --from=builder /app/.env.local ./.env.local
 
 EXPOSE 3000
 
