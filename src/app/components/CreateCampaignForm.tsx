@@ -1,16 +1,22 @@
 "use client";
 import React from "react";
 import { callChatGPT, extractTopics } from "../logics/ai";
+import { useRouter } from "next/navigation";
+import { TopicsContext } from "../components/big-idea/TopicsContext";
 import { AI_CONFIG } from "../config/ai.config";
 import Link from "next/link";
 
 const CreateCampaignForm: React.FC = () => {
+  const [loading, setLoading] = React.useState(false);
+  const router = useRouter();
+  const { setTopics } = React.useContext(TopicsContext);
   const handleUpload = async () => {
     // Mock data from form (replace with state if making dynamic)
     const product = "ประกันสะสมทรัพย์";
     const selling_point = "คุ้มครองชีวิตและเงินออมระยะยาว";
     const objective = "เพิ่มยอดขายและ lead";
     const target = "W1 : Senior – Business Owner, W2 : Senior – Professional";
+    setLoading(true);
     try {
       const response = await callChatGPT({
         product,
@@ -19,18 +25,32 @@ const CreateCampaignForm: React.FC = () => {
         target,
         apiKey: AI_CONFIG.CHATGPT_API_KEY
       });
+      
       console.log("ChatGPT response:", response);
-      // สมมติ response.data.choices[0].message.content คือ string ที่ต้องการ
+
       const content = response?.choices?.[0]?.message?.content || "";
       const filtered = extractTopics(content);
-      console.log("Filtered topics:", filtered);
+      setTopics(filtered);
+      router.push("/big-idea");
     } catch (err) {
       console.error("ChatGPT error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex min-h-screen bg-[#F7FAFC]">
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+          <div className="w-1/2 bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
+            <div className="w-full h-4 bg-gray-200 rounded-full mb-4">
+              <div className="h-4 bg-blue-500 rounded-full animate-pulse" style={{ width: '80%' }}></div>
+            </div>
+            <span className="text-blue-700 font-semibold">กำลังสร้างไอเดียจาก AI กรุณารอสักครู่...</span>
+          </div>
+        </div>
+      )}
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-[#E5E7EB] flex flex-col py-6 px-4">
         <div className="flex items-center gap-2 mb-8">
@@ -211,9 +231,7 @@ const CreateCampaignForm: React.FC = () => {
               </div>
             </div>
             <div className="flex justify-end">
-              <Link href="/big-idea">
-                <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg" onClick={handleUpload}>Next</button>
-              </Link>
+              <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg" onClick={handleUpload} disabled={loading}>Next</button>
             </div>
           </div>
         </section>

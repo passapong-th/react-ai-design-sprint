@@ -31,6 +31,7 @@ export function extractTopics(response: string): AdVersion[] {
       current = {};
     }
   }
+  console.log('extractTopics result:', versions);
   return versions;
 }
 // src/app/logics/ai.ts

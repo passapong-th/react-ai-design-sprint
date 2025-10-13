@@ -1,30 +1,13 @@
+"use client";
 import React from "react";
+import { TopicsContext } from "./big-idea/TopicsContext";
 import Link from "next/link";
 
-const bigIdeas = [
-  {
-    title: "Pain–Agitate–Solve (สำหรับผู้ที่กังวลเรื่องการออม)",
-    desc: "ออมเงินตั้งนาน แต่ทำไมออมไม่ถึงเป้า? หลายคนมองว่าผลลัพธ์ระยะยาวดูห่างตัวต่างคิดตามแผนและอาจหมดแรงบันดาลใจเอง ttb ช่วยเสนอแผนประกันสะสมทรัพย์ที่คุ้มครองและต่อยอดผลตอบแทนที่ก้าวไกลได้ พร้อมประกันสะสมทรัพย์ดูแลและตอบแทนมากกว่าผลได้! เป้าหมายเดิมแต่มั่นใจขึ้น!"
-  },
-  {
-    title: "Before–After–Bridge (สำหรับผู้ที่ต้องการความมั่นคงในชีวิต)",
-    desc: "หลายคนกังวลว่าการออมเงินเพื่ออนาคตคุณจะมีอยู่ตลอดและไม่คุ้มกัน จนกระทั่งมีตัวช่วยเปลี่ยนทุกสถานการณ์ให้กลายเป็นกระแสประกันต่อการเงินที่คุ้มกว่าเดิม แต่สำหรับผู้ที่มี ttb ประกันสะสมทรัพย์ ชีวิตจะเปลี่ยนไปอย่างมั่นใจขึ้น!"
-  },
-  {
-    title: "Social Proof (สำหรับผู้ที่ต้องการความน่าเชื่อถือ)",
-    desc: "ทำไม ttb ประกันสะสมทรัพย์ถึงได้รับความไว้วางใจ? เพราะเรามีการรับรองจากสถาบันชั้นนำและมีผลตอบแทนที่ตรวจสอบได้จริงเป็นลำดับก่อน พร้อมประสิทธิภาพของผลิตภัณฑ์ที่มากกว่าผลิตภัณฑ์คู่แข่งหลายเท่าและประสบการณ์จริงจากการรีวิวจริงว่าการออมแบบนี้ดีที่สุด! หากคุณต้องการออมอย่างมั่นใจ นี่คือสิ่งที่คุณต้องมี!"
-  },
-  {
-    title: "Guarantee/No-Risk (สำหรับผู้ที่กังวลความเสี่ยง)",
-    desc: "หนึ่งในเหตุผลหลักที่คนลังเลเรื่องประกันคือความเสี่ยง 'ความไม่แน่นอน' และความกลัวว่าจะขาดทุนหรือผลตอบแทนเป็นศูนย์ แต่ ttb ให้ผลตอบแทนที่คุ้มค่าแก่ผู้ที่กล้าให้ 'การรับประกันคืนทุนทุกปี' ในปีที่ต้องออมตามแผนประกันสะสมทรัพย์ ไม่มีคำว่าขาดทุน มีแต่คำว่ามั่นใจ! การออมวันนี้มีแต่ได้! กระจายความเสี่ยงให้มั่นใจขึ้น แต่มีความคุ้มค่ามากขึ้นตามแผนประกันที่มั่นใจได้!"
-  },
-  {
-    title: "How-To/Education (สำหรับผู้ที่ต้องการความรู้)",
-    desc: "อยากออมเงินแต่ยังไม่รู้ต้องเริ่มยังไง ไม่กล้าตัดสินใจ ttb ประกันสะสมทรัพย์ทุกคนแนะนำวิธีออมแบบที่ตอบโจทย์ผู้สนใจที่ต้องการวางแผนการเงินได้อย่างมั่นใจตั้งแต่เริ่มต้น เรียนรู้ทุกขั้นตอนง่ายๆ ช่วยวางแผนการออมแบบมั่นใจและสามารถนำเงินตรงตามเป้าหมาย!"
-  }
-];
-
 const BigIdeaForm: React.FC = () => {
+  const { topics } = React.useContext(TopicsContext);
+  React.useEffect(() => {
+    console.log('BigIdeaForm topics:', topics);
+  }, [topics]);
   return (
     <div className="flex min-h-screen bg-[#F7FAFC]">
       {/* Sidebar */}
@@ -68,12 +51,19 @@ const BigIdeaForm: React.FC = () => {
             <div className="text-[#2563EB] mb-2">เลือกไอเดียที่ชอบ (สามารถเลือกได้มากกว่า 1 ไอเดีย)</div>
           </div>
           <form className="flex flex-col gap-4">
-            {bigIdeas.map((idea, idx) => (
+            {topics.map((topic, idx) => (
               <label key={idx} className="bg-white rounded-xl border border-[#E5E7EB] p-6 flex gap-4 items-start cursor-pointer">
                 <input type="checkbox" className="accent-[#2563EB] mt-1" />
                 <div>
-                  <div className="font-semibold text-[#1A202C] mb-1">{idea.title}</div>
-                  <div className="text-[#4B5563] text-sm">{idea.desc}</div>
+                  <div className="font-semibold text-[#1A202C] mb-1">{topic.primaryText}</div>
+                  {topic.headline && (
+                    <div className="text-blue-600 text-sm mb-1">{topic.headline}</div>
+                  )}
+                  <div className="text-[#4B5563] text-sm">
+                    {topic.description && (
+                      <span className="text-blue-600">{topic.description}</span>
+                    )}
+                  </div>
                 </div>
               </label>
             ))}
