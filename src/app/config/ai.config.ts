@@ -1,4 +1,4 @@
 // src/app/config/ai.config.ts
 export const AI_CONFIG = {
-  CHATGPT_API_KEY: process.env.CHATGPT_API_KEY || "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"
+  CHATGPT_API_KEY: process.env.NEXT_PUBLIC_CHATGPT_API_KEY || ""
 };
