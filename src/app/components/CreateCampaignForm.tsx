@@ -17,7 +17,7 @@ const CreateCampaignForm: React.FC = () => {
         selling_point,
         objective,
         target,
-        apiKey: "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" 
+        apiKey: AI_CONFIG.CHATGPT_API_KEY
       });
       console.log("ChatGPT response:", response);
       // สมมติ response.data.choices[0].message.content คือ string ที่ต้องการ
