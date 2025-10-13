@@ -16,6 +16,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Set environment variable for OpenAI API Key
+ENV NEXT_PUBLIC_CHATGPT_API_KEY=""
+
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
