@@ -44,7 +44,7 @@ const BigIdeaForm: React.FC = () => {
           </div>
         </header>
         {/* Form Section */}
-        <section className="p-8 flex flex-col gap-6 max-w-5xl mx-auto">
+        <section className="p-8 flex flex-col gap-6 w-full">
           <div className="mb-4">
             <h2 className="font-semibold text-xl text-[#2563EB] mb-2">AI Big Idea</h2>
             <div className="text-lg font-semibold text-[#1A202C] mb-2">Campaign name : ประกันสะสมทรัพย์</div>
@@ -52,16 +52,16 @@ const BigIdeaForm: React.FC = () => {
           </div>
           <form className="flex flex-col gap-4">
             {topics.map((topic, idx) => (
-              <label key={idx} className="bg-white rounded-xl border border-[#E5E7EB] p-6 flex gap-4 items-start cursor-pointer">
-                <input type="checkbox" className="accent-[#2563EB] mt-1" />
+              <label key={idx} className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex gap-6 items-start cursor-pointer w-full">
+                <input type="checkbox" className="accent-[#2563EB] mt-1 scale-125" />
                 <div className="w-full">
-                  <div className="font-semibold text-[#1A202C] mb-2">{topic.primaryText}</div>
+                  <div className="font-semibold text-[#1A202C] mb-3 text-lg">{topic.primaryText}</div>
                   {topic.headline && (
-                    <div className="text-blue-600 text-sm font-medium mb-2">
+                    <div className="text-blue-600 text-base font-medium mb-3">
                       <span className="text-black">Headline:</span> {topic.headline}
                     </div>
                   )}
-                  <div className="text-[#4B5563] text-sm mb-2">
+                  <div className="text-[#4B5563] text-base mb-3">
                     {topic.description && (
                       <span>
                         <span className="text-black">Description:</span> 
@@ -70,16 +70,16 @@ const BigIdeaForm: React.FC = () => {
                     )}
                   </div>
                   {topic.hashtag && (
-                    <div className="text-blue-500 text-sm">
+                    <div className="text-blue-500 text-base">
                       <span className="text-black">Hashtag:</span> {topic.hashtag}
                     </div>
                   )}
                 </div>
               </label>
             ))}
-            <div className="bg-white rounded-xl border border-[#E5E7EB] p-6 flex flex-col gap-2">
-              <label className="font-medium text-[#4B5563] mb-1">Input เพิ่มเติม</label>
-              <input type="text" className="border border-[#E5E7EB] rounded-lg px-3 py-2" placeholder="Input เพิ่มเติมหากต้องการใส่ Requirement เพิ่มเติม" />
+            <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex flex-col gap-2 w-full">
+              <label className="font-medium text-[#4B5563] mb-1 text-base">Input เพิ่มเติม</label>
+              <input type="text" className="border border-[#E5E7EB] rounded-lg px-4 py-3 text-base" placeholder="Input เพิ่มเติมหากต้องการใส่ Requirement เพิ่มเติม" />
             </div>
           </form>
           <div className="flex justify-between mt-6">
