@@ -14,10 +14,11 @@ RUN npm run build
 FROM node:18-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV=production
-
-# Set environment variable for OpenAI API Key (can be overridden by Cloud Run)
+# Accept build argument for API key
+ARG NEXT_PUBLIC_CHATGPT_API_KEY
 ENV NEXT_PUBLIC_CHATGPT_API_KEY=${NEXT_PUBLIC_CHATGPT_API_KEY}
+
+ENV NODE_ENV=production
 
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/.next ./.next
