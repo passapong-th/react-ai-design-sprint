@@ -8,19 +8,18 @@ import Link from "next/link";
 
 const CreateCampaignForm: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
+  const [product, setProduct] = React.useState("ประกันสะสมทรัพย์");
+  const [sellingPoint, setSellingPoint] = React.useState("คุ้มครองชีวิตและเงินออมระยะยาว");
+  const [objective, setObjective] = React.useState("เพิ่มยอดขายและ lead");
+  const [target, setTarget] = React.useState("W1 : Senior – Business Owner, W2 : Senior – Professional");
   const router = useRouter();
   const { setTopics } = React.useContext(TopicsContext);
   const handleUpload = async () => {
-    // Mock data from form (replace with state if making dynamic)
-    const product = "ประกันสะสมทรัพย์";
-    const selling_point = "คุ้มครองชีวิตและเงินออมระยะยาว";
-    const objective = "เพิ่มยอดขายและ lead";
-    const target = "W1 : Senior – Business Owner, W2 : Senior – Professional";
     setLoading(true);
     try {
       const response = await callChatGPT({
         product,
-        selling_point,
+        selling_point: sellingPoint,
         objective,
         target,
         apiKey: AI_CONFIG.CHATGPT_API_KEY
@@ -94,7 +93,12 @@ const CreateCampaignForm: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Product/Service</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="ประกันสะสมทรัพย์" readOnly />
+                <input 
+                  type="text" 
+                  className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
+                  value={product} 
+                  onChange={(e) => setProduct(e.target.value)}
+                />
               </div>
             </div>
             <div className="flex gap-6 items-center">
@@ -193,17 +197,35 @@ const CreateCampaignForm: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Goals & Indication</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="วัดประเมินผลกับเป้าหมาย: [[Conversions|Leads|Messages|Traffic|Awareness]]" readOnly />
+                <input 
+                  type="text" 
+                  className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
+                  value={objective} 
+                  onChange={(e) => setObjective(e.target.value)}
+                  placeholder="เพิ่มยอดขายและ lead"
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">รายละเอียด sub-segment เพิ่มเติม</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="20,000-50,000 / กรุงเทพฯ / มีรายงานวิดีโอ / 0-3 คน" readOnly />
+                <input 
+                  type="text" 
+                  className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
+                  value={target} 
+                  onChange={(e) => setTarget(e.target.value)}
+                  placeholder="W1 : Senior – Business Owner, W2 : Senior – Professional"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Mood and tone</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="โทนภาพ [เป็นกันเอง/มืออาชีพ/สนุก/พรีเมียม/จริงใจ]..." readOnly />
+                <input 
+                  type="text" 
+                  className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
+                  value={sellingPoint} 
+                  onChange={(e) => setSellingPoint(e.target.value)}
+                  placeholder="คุ้มครองชีวิตและเงินออมระยะยาว"
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6 mb-4">
