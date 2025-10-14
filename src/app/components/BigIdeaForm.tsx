@@ -58,17 +58,20 @@ const BigIdeaForm: React.FC = () => {
                   <div className="font-semibold text-[#1A202C] mb-2">{topic.primaryText}</div>
                   {topic.headline && (
                     <div className="text-blue-600 text-sm font-medium mb-2">
-                      <span className="text-gray-500">Headline:</span> {topic.headline}
+                      <span className="text-black">Headline:</span> {topic.headline}
                     </div>
                   )}
                   <div className="text-[#4B5563] text-sm mb-2">
                     {topic.description && (
-                      <span className="text-blue-600">{topic.description}</span>
+                      <span>
+                        <span className="text-black">Description:</span> 
+                        <span className="text-blue-600"> {topic.description}</span>
+                      </span>
                     )}
                   </div>
                   {topic.hashtag && (
                     <div className="text-blue-500 text-sm">
-                      <span className="text-gray-500">Hashtag:</span> {topic.hashtag}
+                      <span className="text-black">Hashtag:</span> {topic.hashtag}
                     </div>
                   )}
                 </div>
