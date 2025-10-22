@@ -303,7 +303,15 @@ const CreateCampaignForm: React.FC = () => {
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1 text-[#4B5563]">Output*</label>
-              <textarea className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 h-24" readOnly value={"โฆษณาแคมเปญ 'ชุดครอบที่พร้อมส่งเมื่อโอนครบ' ดังนี้:\n5.1 ชุดคอนเทนต์แนะนำเทมเพลต ต่างต่อยอด 5 เวอร์ชั่น\nสำหรับแต่ละเวอร์ชั่น ให้มี:\nPrimary Text 3 (ความยาว...)\n..."}></textarea>
+              <textarea 
+                className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 h-32 text-sm" 
+                readOnly 
+                value={`บทบาทของคุณ: คุณคือ Creative & Performance Marketer ที่เชี่ยวชาญ Facebook/Instagram Ads และ Direct Response Copywriting พร้อมคิดคอนเซปต์ คอนเทนต์ และสคริปต์วิดีโอได้ครบถ้วน ตั้งเป้า Conversion/Lead/Message ตามที่กำหนด 
+
+1) บริบทแบรนด์/สินค้า ชื่อแบรนด์:ttb หมวดสินค้า/บริการ:${product} จุดขายหลัก (USP):${sellingPoint} วัตถุประสงค์แคมเปญ:${objective} กลุ่มเป้าหมาย:${target} 
+
+สิ่งที่ต้องการให้สร้าง (Output)โปรดส่งมอบ ชุดครีเอทีฟพร้อมยิงโฆษณา ดังนี้ ชุดคอนเทนต์โฆษณา (อย่างน้อย 5 เวอร์ชัน) สำหรับแต่ละเวอร์ชัน ให้มี:Primary Text (3 ความยาว):สั้น ≤125 ตัวอักษร (Hook ชัด อ่านจบในมือถือ)กลาง 125–220 ตัวอักษรยาว 221–500 ตัวอักษร Headline (3 แบบ): เน้นคมชัด แนะนำ ≤27 ตัวอักษรสำหรับมือถือ Description (1 แบบ): ≤30 ตัวอักษร (เสริมความเข้าใจ) อีโมจิ/ไอคอน: ใส่พอดี ช่วยอ่านง่าย (ถ้าเหมาะสม) แฮชแท็ก: 2–4 แท็ก (เน้นสื่อความ ไม่สแปม) สร้าง Hook แบบคำถาม, ตัวเลข, ข้อเปรียบเทียบ, ผลลัพธ์, ข้อท้าทาย, ข้อผิดพลาดที่พบบ่อย`}
+              />
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1 text-[#4B5563]">Insight</label>
