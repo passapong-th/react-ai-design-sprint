@@ -12,9 +12,35 @@ const CreateCampaignForm: React.FC = () => {
   const [sellingPoint, setSellingPoint] = React.useState("คุ้มครองชีวิตและเงินออมระยะยาว");
   const [objective, setObjective] = React.useState("เพิ่มยอดขายและ lead");
   const [target, setTarget] = React.useState("W1 : Senior – Business Owner, W2 : Senior – Professional");
+  const [showApiKeyModal, setShowApiKeyModal] = React.useState(false);
+  const [apiKey, setApiKey] = React.useState("");
   const router = useRouter();
   const { setTopics } = React.useContext(TopicsContext);
+
+  React.useEffect(() => {
+    // เช็คว่ามี API key หรือไม่
+    const savedApiKey = localStorage.getItem('NEXT_PUBLIC_CHATGPT_API_KEY');
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+    }
+  }, []);
+
+  const handleSaveApiKey = () => {
+    if (apiKey.trim()) {
+      localStorage.setItem('NEXT_PUBLIC_CHATGPT_API_KEY', apiKey.trim());
+      setShowApiKeyModal(false);
+    }
+  };
+
   const handleUpload = async () => {
+    // เช็ค API key ก่อนทำการ upload
+    const currentApiKey = localStorage.getItem('NEXT_PUBLIC_CHATGPT_API_KEY');
+
+    if (!currentApiKey) {
+      setShowApiKeyModal(true);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await callChatGPT({
@@ -22,7 +48,7 @@ const CreateCampaignForm: React.FC = () => {
         selling_point: sellingPoint,
         objective,
         target,
-        apiKey: AI_CONFIG.CHATGPT_API_KEY
+        apiKey: currentApiKey
       });
       
       console.log("ChatGPT response:", response);
@@ -40,6 +66,43 @@ const CreateCampaignForm: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-[#F7FAFC]">
+      {/* API Key Modal */}
+      {showApiKeyModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Enter OpenAI API Key</h2>
+            <p className="text-gray-600 mb-6">Please enter your OpenAI API key to use AI features.</p>
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="sk-proj-..."
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-black mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  handleSaveApiKey();
+                  // หลังจากบันทึก API key แล้วให้ลองเรียก handleUpload อีกครั้ง
+                  if (apiKey.trim()) {
+                    setTimeout(handleUpload, 100);
+                  }
+                }}
+                disabled={!apiKey.trim()}
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700"
+              >
+                Save & Continue
+              </button>
+              <button
+                onClick={() => setShowApiKeyModal(false)}
+                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="w-1/2 bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
