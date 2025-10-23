@@ -1,7 +1,5 @@
-"use client";
 import React from "react";
 import Link from "next/link";
-import { generateImageWithGemini } from "../logics/ai";
 
 const kvOptions = [
   {
@@ -25,103 +23,8 @@ const kvOptions = [
 ];
 
 const GenerateKVForm: React.FC = () => {
-  const [isGeneratingImage, setIsGeneratingImage] = React.useState(false);
-  const [generatedImageText, setGeneratedImageText] = React.useState<string>("");
-  const [showApiKeyModal, setShowApiKeyModal] = React.useState(false);
-  const [apiKey, setApiKey] = React.useState("");
-
-  React.useEffect(() => {
-    // เช็คว่ามี Google AI API key หรือไม่
-    const savedApiKey = localStorage.getItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY');
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
-    }
-  }, []);
-
-  const handleSaveApiKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY', apiKey.trim());
-      setShowApiKeyModal(false);
-    }
-  };
-
-  const handleGenerateImageForIdea1 = async () => {
-    // เช็ค API key ก่อนทำการ generate
-    const currentApiKey = localStorage.getItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY');
-
-    if (!currentApiKey) {
-      setShowApiKeyModal(true);
-      return;
-    }
-
-    setIsGeneratingImage(true);
-    try {
-      const prompt = "Generate a creative visual concept for insurance advertisement with theme 'ประกันเป็นเรื่องใกล้ตัว' (Insurance is close to you). Focus on everyday life scenarios that show the importance of financial planning and insurance protection.";
-      
-      const result = await generateImageWithGemini({
-        prompt,
-        apiKey: currentApiKey
-      });
-      
-      setGeneratedImageText(result);
-      console.log("Generated image concept:", result);
-    } catch (err) {
-      console.error("Gemini AI error:", err);
-    } finally {
-      setIsGeneratingImage(false);
-    }
-  };
   return (
     <div className="flex min-h-screen bg-[#F7FAFC]">
-      {/* Google AI API Key Modal */}
-      {showApiKeyModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Enter Google AI API Key</h2>
-            <p className="text-gray-600 mb-6">Please enter your Google AI API key to generate images.</p>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="AIza..."
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-black mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  handleSaveApiKey();
-                  // หลังจากบันทึก API key แล้วให้ลองเรียก handleGenerateImageForIdea1 อีกครั้ง
-                  if (apiKey.trim()) {
-                    setTimeout(handleGenerateImageForIdea1, 100);
-                  }
-                }}
-                disabled={!apiKey.trim()}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700"
-              >
-                Save & Generate
-              </button>
-              <button
-                onClick={() => setShowApiKeyModal(false)}
-                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Loading Modal */}
-      {isGeneratingImage && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-          <div className="w-1/2 bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
-            <div className="w-full h-4 bg-gray-200 rounded-full mb-4">
-              <div className="h-4 bg-green-500 rounded-full animate-pulse" style={{ width: '70%' }}></div>
-            </div>
-            <span className="text-green-700 font-semibold">กำลังสร้างคอนเซปต์ภาพจาก Google AI กรุณารอสักครู่...</span>
-          </div>
-        </div>
-      )}
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-[#E5E7EB] flex flex-col py-6 px-4">
         <div className="flex items-center gap-2 mb-8">
@@ -168,33 +71,7 @@ const GenerateKVForm: React.FC = () => {
             {kvOptions.map((option, idx) => (
               <label key={idx} className="bg-white rounded-xl border border-[#E5E7EB] p-6 flex flex-col gap-2 w-1/3 cursor-pointer">
                 <input type="checkbox" className="accent-[#2563EB] mb-2" />
-                
-                {/* Special handling for Idea 1 */}
-                {idx === 0 ? (
-                  <div className="mb-2">
-                    <img src={option.img} alt={option.title} className="rounded-lg w-full h-48 object-cover mb-2" />
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleGenerateImageForIdea1();
-                      }}
-                      disabled={isGeneratingImage}
-                      className="w-full bg-green-600 text-white px-3 py-2 rounded-lg font-semibold text-sm hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed mb-2"
-                    >
-                      {isGeneratingImage ? 'กำลังสร้าง...' : 'Generate Image Concept'}
-                    </button>
-                    {generatedImageText && (
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
-                        <div className="text-green-800 text-xs font-semibold mb-1">AI Generated Concept:</div>
-                        <div className="text-green-700 text-xs">{generatedImageText}</div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <img src={option.img} alt={option.title} className="rounded-lg w-full h-48 object-cover mb-2" />
-                )}
-                
+                <img src={option.img} alt={option.title} className="rounded-lg w-full h-48 object-cover mb-2" />
                 <div className="font-semibold text-[#1A202C] mb-1">{option.title}</div>
                 <div className="text-[#2563EB] text-sm mb-1">{option.subtitle}</div>
                 <div className="text-[#4B5563] text-sm mb-2">{option.desc}</div>
