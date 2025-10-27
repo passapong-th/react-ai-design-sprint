@@ -104,7 +104,7 @@ const GenerateKVForm: React.FC = () => {
               value={geminiApiKey}
               onChange={(e) => setGeminiApiKey(e.target.value)}
               placeholder="AIza..."
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-black mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-black mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="flex gap-3">
               <button
@@ -112,7 +112,7 @@ const GenerateKVForm: React.FC = () => {
                   handleSaveGeminiApiKey();
                 }}
                 disabled={!geminiApiKey.trim()}
-                className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-green-700"
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700"
               >
                 Save & Generate
               </button>
@@ -132,9 +132,9 @@ const GenerateKVForm: React.FC = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="w-1/2 bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
             <div className="w-full h-4 bg-gray-200 rounded-full mb-4">
-              <div className="h-4 bg-green-500 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+              <div className="h-4 bg-blue-500 rounded-full animate-pulse" style={{ width: '75%' }}></div>
             </div>
-            <span className="text-green-700 font-semibold">กำลังสร้างภาพจาก Gemini AI กรุณารอสักครู่...</span>
+            <span className="text-blue-700 font-semibold">กำลังสร้างภาพจาก Gemini AI กรุณารอสักครู่...</span>
           </div>
         </div>
       )}
@@ -201,14 +201,8 @@ const GenerateKVForm: React.FC = () => {
                     </div>
                   )}
                   {geminiImages[idx] && (
-                    <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                      ✨ Gemini
-                    </div>
-                  )}
-                  {geminiImages[idx] && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-2 mb-2">
-                      <div className="text-green-800 text-xs font-semibold mb-1">✨ Gemini Generated</div>
-                      <div className="text-green-700 text-xs">{geminiImages[idx]!.description}</div>
+                    <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                      ✨ AI
                     </div>
                   )}
                 </div>
