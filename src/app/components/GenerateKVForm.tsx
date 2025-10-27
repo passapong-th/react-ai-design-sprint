@@ -25,8 +25,8 @@ const kvOptions = [
 ];
 
 const GenerateKVForm: React.FC = () => {
-  const [geminiImage, setGeminiImage] = React.useState<{imageUrl: string, description: string} | null>(null);
-  const [isGeneratingGemini, setIsGeneratingGemini] = React.useState<boolean>(false);
+  const [geminiImages, setGeminiImages] = React.useState<Array<{imageUrl: string, description: string} | null>>([null, null, null]);
+  const [isGeneratingGemini, setIsGeneratingGemini] = React.useState<boolean[]>([false, false, false]);
   const [showGeminiApiKeyModal, setShowGeminiApiKeyModal] = React.useState(false);
   const [geminiApiKey, setGeminiApiKey] = React.useState("");
 
@@ -35,40 +35,59 @@ const GenerateKVForm: React.FC = () => {
     const savedApiKey = localStorage.getItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY');
     if (savedApiKey) {
       setGeminiApiKey(savedApiKey);
+      // เริ่มสร้างภาพทั้ง 3 ภาพ
+      generateAllImages(savedApiKey);
+    } else {
+      setShowGeminiApiKeyModal(true);
     }
   }, []);
+
+  const generateAllImages = async (apiKey: string) => {
+    const prompts = [
+      "Create a professional insurance advertisement image showing close and personal financial security. The image should convey trust, warmth, and everyday life protection for Thai insurance market.",
+      "Create a professional insurance advertisement image showing family love and financial planning. The image should convey care, protection, and long-term planning for loved ones in Thai insurance market.", 
+      "Create a professional insurance advertisement image showing freedom of choice and future planning. The image should convey empowerment, options, and control over one's financial future in Thai insurance market."
+    ];
+
+    // สร้างภาพทั้ง 3 ภาพพร้อมกัน
+    for (let i = 0; i < 3; i++) {
+      setIsGeneratingGemini(prev => {
+        const newState = [...prev];
+        newState[i] = true;
+        return newState;
+      });
+
+      try {
+        const result = await generateImageWithGemini({
+          prompt: prompts[i],
+          apiKey: apiKey
+        });
+        
+        setGeminiImages(prev => {
+          const newImages = [...prev];
+          newImages[i] = result;
+          return newImages;
+        });
+        
+        console.log(`Generated Gemini image ${i + 1}:`, result);
+      } catch (err) {
+        console.error(`Gemini image generation error for idea ${i + 1}:`, err);
+      } finally {
+        setIsGeneratingGemini(prev => {
+          const newState = [...prev];
+          newState[i] = false;
+          return newState;
+        });
+      }
+    }
+  };
 
   const handleSaveGeminiApiKey = () => {
     if (geminiApiKey.trim()) {
       localStorage.setItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY', geminiApiKey.trim());
       setShowGeminiApiKeyModal(false);
-    }
-  };
-
-  const handleGenerateGeminiImage = async () => {
-    // เช็ค API key ก่อนทำการ generate
-    const currentApiKey = localStorage.getItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY');
-
-    if (!currentApiKey) {
-      setShowGeminiApiKeyModal(true);
-      return;
-    }
-
-    setIsGeneratingGemini(true);
-    try {
-      const prompt = "Create a professional insurance advertisement image showing financial security, family protection, and long-term savings planning. The image should convey trust, stability, and peace of mind for Thai insurance market.";
-      
-      const result = await generateImageWithGemini({
-        prompt,
-        apiKey: currentApiKey
-      });
-      
-      setGeminiImage(result);
-      console.log("Generated Gemini image:", result);
-    } catch (err) {
-      console.error("Gemini image generation error:", err);
-    } finally {
-      setIsGeneratingGemini(false);
+      // เริ่มสร้างภาพหลังจากบันทึก API key
+      generateAllImages(geminiApiKey.trim());
     }
   };
 
@@ -91,9 +110,6 @@ const GenerateKVForm: React.FC = () => {
               <button
                 onClick={() => {
                   handleSaveGeminiApiKey();
-                  if (geminiApiKey.trim()) {
-                    setTimeout(handleGenerateGeminiImage, 100);
-                  }
                 }}
                 disabled={!geminiApiKey.trim()}
                 className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-green-700"
@@ -112,7 +128,7 @@ const GenerateKVForm: React.FC = () => {
       )}
 
       {/* Gemini Loading Modal */}
-      {isGeneratingGemini && (
+      {isGeneratingGemini.some(isLoading => isLoading) && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="w-1/2 bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
             <div className="w-full h-4 bg-gray-200 rounded-full mb-4">
@@ -169,39 +185,33 @@ const GenerateKVForm: React.FC = () => {
               <label key={idx} className="bg-white rounded-xl border border-[#E5E7EB] p-6 flex flex-col gap-2 w-1/3 cursor-pointer">
                 <input type="checkbox" className="accent-[#2563EB] mb-2" />
                 
-                {/* Special handling for Idea 1 with Gemini */}
-                {idx === 0 ? (
-                  <div className="mb-2">
-                    <img 
-                      src={geminiImage ? geminiImage.imageUrl : option.img} 
-                      alt={option.title} 
-                      className="rounded-lg w-full h-48 object-cover mb-2" 
-                    />
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleGenerateGeminiImage();
-                      }}
-                      disabled={isGeneratingGemini}
-                      className="w-full bg-green-600 text-white px-3 py-2 rounded-lg font-semibold text-sm hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed mb-2"
-                    >
-                      {isGeneratingGemini ? 'กำลังสร้าง...' : 'Generate with Gemini AI'}
-                    </button>
-                    {geminiImage && (
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-2 mb-2">
-                        <div className="text-green-800 text-xs font-semibold mb-1">✨ Gemini Generated</div>
-                        <div className="text-green-700 text-xs">{geminiImage.description}</div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
+                {/* All ideas now use Gemini images */}
+                <div className="mb-2 relative">
                   <img 
-                    src={option.img} 
+                    src={geminiImages[idx] ? geminiImages[idx]!.imageUrl : option.img} 
                     alt={option.title} 
                     className="rounded-lg w-full h-48 object-cover mb-2" 
                   />
-                )}
+                  {isGeneratingGemini[idx] && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+                      <div className="text-white text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mb-2 mx-auto"></div>
+                        <div className="text-sm">Generating...</div>
+                      </div>
+                    </div>
+                  )}
+                  {geminiImages[idx] && (
+                    <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                      ✨ Gemini
+                    </div>
+                  )}
+                  {geminiImages[idx] && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-2 mb-2">
+                      <div className="text-green-800 text-xs font-semibold mb-1">✨ Gemini Generated</div>
+                      <div className="text-green-700 text-xs">{geminiImages[idx]!.description}</div>
+                    </div>
+                  )}
+                </div>
                 
                 <div className="font-semibold text-[#1A202C] mb-1">{option.title}</div>
                 <div className="text-[#2563EB] text-sm mb-1">{option.subtitle}</div>
