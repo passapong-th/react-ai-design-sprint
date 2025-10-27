@@ -2,12 +2,41 @@
 import React from "react";
 import { TopicsContext } from "./big-idea/TopicsContext";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const BigIdeaForm: React.FC = () => {
   const { topics } = React.useContext(TopicsContext);
+  const [selectedTopics, setSelectedTopics] = React.useState<number[]>([]);
+  const [additionalInput, setAdditionalInput] = React.useState("");
+  const router = useRouter();
+
   React.useEffect(() => {
     console.log('BigIdeaForm topics:', topics);
   }, [topics]);
+
+  const handleTopicSelection = (index: number) => {
+    setSelectedTopics(prev => {
+      if (prev.includes(index)) {
+        return prev.filter(i => i !== index);
+      } else {
+        return [...prev, index];
+      }
+    });
+  };
+
+  const handleNext = () => {
+    // บันทึกข้อมูลที่เลือกลง localStorage
+    const selectedData = {
+      selectedTopics: selectedTopics.map(index => topics[index]),
+      additionalInput: additionalInput,
+      timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem('selectedBigIdeas', JSON.stringify(selectedData));
+    console.log('Selected Big Ideas saved:', selectedData);
+    
+    router.push('/generate-kv');
+  };
   return (
     <div className="flex min-h-screen bg-[#F7FAFC]">
       {/* Sidebar */}
@@ -53,7 +82,12 @@ const BigIdeaForm: React.FC = () => {
           <form className="flex flex-col gap-4">
             {topics.map((topic, idx) => (
               <label key={idx} className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex gap-6 items-start cursor-pointer w-full">
-                <input type="checkbox" className="accent-[#2563EB] mt-1 scale-125" />
+                <input 
+                  type="checkbox" 
+                  className="accent-[#2563EB] mt-1 scale-125" 
+                  checked={selectedTopics.includes(idx)}
+                  onChange={() => handleTopicSelection(idx)}
+                />
                 <div className="w-full">
                   <div className="font-semibold text-[#1A202C] mb-3 text-lg">{topic.primaryText}</div>
                   {topic.headline && (
@@ -79,16 +113,26 @@ const BigIdeaForm: React.FC = () => {
             ))}
             <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 flex flex-col gap-2 w-full">
               <label className="font-medium text-[#4B5563] mb-1 text-base">Input เพิ่มเติม</label>
-              <input type="text" className="border border-[#E5E7EB] rounded-lg px-4 py-3 text-base" placeholder="Input เพิ่มเติมหากต้องการใส่ Requirement เพิ่มเติม" />
+              <input 
+                type="text" 
+                className="border border-[#E5E7EB] rounded-lg px-4 py-3 text-base" 
+                placeholder="Input เพิ่มเติมหากต้องการใส่ Requirement เพิ่มเติม"
+                value={additionalInput}
+                onChange={(e) => setAdditionalInput(e.target.value)}
+              />
             </div>
           </form>
           <div className="flex justify-between mt-6">
             <Link href="/">
               <button className="bg-[#F3F6FB] text-[#2563EB] px-8 py-2 rounded-lg font-semibold text-lg">Previous</button>
             </Link>
-            <Link href="/generate-kv">
-              <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg">Next</button>
-            </Link>
+            <button 
+              onClick={handleNext}
+              className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled={selectedTopics.length === 0}
+            >
+              Next ({selectedTopics.length} selected)
+            </button>
           </div>
         </section>
       </main>

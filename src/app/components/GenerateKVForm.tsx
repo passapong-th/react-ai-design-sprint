@@ -29,8 +29,17 @@ const GenerateKVForm: React.FC = () => {
   const [isGeneratingGemini, setIsGeneratingGemini] = React.useState<boolean[]>([false, false, false]);
   const [showGeminiApiKeyModal, setShowGeminiApiKeyModal] = React.useState(false);
   const [geminiApiKey, setGeminiApiKey] = React.useState("");
+  const [selectedBigIdeas, setSelectedBigIdeas] = React.useState<any[]>([]);
 
   React.useEffect(() => {
+    // อ่านข้อมูล Big Ideas ที่เลือกมา
+    const savedBigIdeas = localStorage.getItem('selectedBigIdeas');
+    if (savedBigIdeas) {
+      const parsedData = JSON.parse(savedBigIdeas);
+      setSelectedBigIdeas(parsedData.selectedTopics || []);
+      console.log('Loaded selected Big Ideas:', parsedData.selectedTopics);
+    }
+
     // เช็คว่ามี Google AI API key หรือไม่
     const savedApiKey = localStorage.getItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY');
     if (savedApiKey) {
@@ -43,10 +52,15 @@ const GenerateKVForm: React.FC = () => {
   }, []);
 
   const generateAllImages = async (apiKey: string) => {
+    // สร้าง prompt จาก Big Ideas ที่เลือก
+    const bigIdeaContext = selectedBigIdeas.length > 0 
+      ? `Based on these selected big ideas: ${selectedBigIdeas.map(idea => `"${idea.primaryText}" - ${idea.description}`).join(', ')}. `
+      : '';
+
     const prompts = [
-      "Create a professional insurance advertisement image showing close and personal financial security. The image should convey trust, warmth, and everyday life protection for Thai insurance market.",
-      "Create a professional insurance advertisement image showing family love and financial planning. The image should convey care, protection, and long-term planning for loved ones in Thai insurance market.", 
-      "Create a professional insurance advertisement image showing freedom of choice and future planning. The image should convey empowerment, options, and control over one's financial future in Thai insurance market."
+      `${bigIdeaContext}Create a professional insurance advertisement image showing close and personal financial security. The image should convey trust, warmth, and everyday life protection for Thai insurance market.`,
+      `${bigIdeaContext}Create a professional insurance advertisement image showing family love and financial planning. The image should convey care, protection, and long-term planning for loved ones in Thai insurance market.`, 
+      `${bigIdeaContext}Create a professional insurance advertisement image showing freedom of choice and future planning. The image should convey empowerment, options, and control over one's financial future in Thai insurance market.`
     ];
 
     // สร้างภาพทั้ง 3 ภาพพร้อมกัน
@@ -178,7 +192,21 @@ const GenerateKVForm: React.FC = () => {
             <div className="text-lg font-semibold text-[#1A202C] mb-2">Campaign name : ประกันสะสมทรัพย์</div>
             <div className="text-[#F59E42] mb-2">เลือกไอเดียที่ชอบ (สามารถเลือกได้มากกว่า 1 ไอเดีย)</div>
             <div className="font-semibold text-[#2563EB] mb-2">AI Big Idea</div>
-            <input type="text" className="border border-[#E5E7EB] rounded-lg px-3 py-2 w-full mb-2" value="Before–After–Bridge (สำหรับผู้ที่ต้องการความมั่นคงในชีวิต)" readOnly />
+            
+            {/* แสดง Big Ideas ที่เลือกมา */}
+            {selectedBigIdeas.length > 0 ? (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div className="text-sm font-medium text-blue-800 mb-2">Selected Big Ideas ({selectedBigIdeas.length}):</div>
+                {selectedBigIdeas.map((idea, index) => (
+                  <div key={index} className="text-sm text-blue-700 mb-1">
+                    • {idea.primaryText}
+                    {idea.description && <span className="text-blue-600"> - {idea.description}</span>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <input type="text" className="border border-[#E5E7EB] rounded-lg px-3 py-2 w-full mb-2" value="Before–After–Bridge (สำหรับผู้ที่ต้องการความมั่นคงในชีวิต)" readOnly />
+            )}
           </div>
           <form className="flex gap-6">
             {kvOptions.map((option, idx) => (
