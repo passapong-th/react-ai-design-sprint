@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 
@@ -71,7 +72,11 @@ const GenerateKVForm: React.FC = () => {
             {kvOptions.map((option, idx) => (
               <label key={idx} className="bg-white rounded-xl border border-[#E5E7EB] p-6 flex flex-col gap-2 w-1/3 cursor-pointer">
                 <input type="checkbox" className="accent-[#2563EB] mb-2" />
-                <img src={option.img} alt={option.title} className="rounded-lg w-full h-48 object-cover mb-2" />
+                <img 
+                  src={option.img} 
+                  alt={option.title} 
+                  className="rounded-lg w-full h-48 object-cover mb-2" 
+                />
                 <div className="font-semibold text-[#1A202C] mb-1">{option.title}</div>
                 <div className="text-[#2563EB] text-sm mb-1">{option.subtitle}</div>
                 <div className="text-[#4B5563] text-sm mb-2">{option.desc}</div>

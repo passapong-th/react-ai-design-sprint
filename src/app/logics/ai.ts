@@ -1,58 +1,11 @@
 
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 // แยก response เป็น array เฉพาะ topic ที่ต้องการ
 export interface AdVersion {
   primaryText: string;
   headline: string;
   description: string;
   hashtag: string;
-}
-
-export async function generateImageWithGemini({
-  prompt,
-  apiKey
-}: {
-  prompt: string;
-  apiKey?: string;
-}) {
-  try {
-    const genAI = new GoogleGenerativeAI(apiKey || process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || '');
-    
-    // ใช้โมเดลที่รองรับใน v1beta API
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    
-    console.log('Gemini response:', text);
-    return text;
-  } catch (error: unknown) {
-    console.error('Gemini AI error:', error);
-    
-    // ลองใช้โมเดลสำรอง
-    try {
-      console.log('Trying fallback model...');
-      const genAI = new GoogleGenerativeAI(apiKey || process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || '');
-      const fallbackModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-      
-      const result = await fallbackModel.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
-      console.log('Fallback Gemini response:', text);
-      return text;
-    } catch (fallbackError) {
-      console.error('Fallback model also failed:', fallbackError);
-      
-      if (error instanceof Error) {
-        throw error.message;
-      }
-      throw error;
-    }
-  }
 }
 
 export function extractTopics(response: string): AdVersion[] {
