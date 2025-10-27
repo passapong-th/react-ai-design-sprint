@@ -3,7 +3,15 @@ import React from "react";
 import Link from "next/link";
 import { generateImageWithGemini } from "../logics/ai";
 
-const kvOptions = [
+interface KvOption {
+  title: string;
+  subtitle: string;
+  desc: string;
+  img: string;
+  bigIdeaData?: any;
+}
+
+const kvOptions: KvOption[] = [
   {
     title: "Idea 1: 'ประกันเป็นเรื่องใกล้ตัว'",
     subtitle: "เริ่มวันนี้ เพื่ออนาคตที่มั่นใจ",
@@ -30,6 +38,7 @@ const GenerateKVForm: React.FC = () => {
   const [showGeminiApiKeyModal, setShowGeminiApiKeyModal] = React.useState(false);
   const [geminiApiKey, setGeminiApiKey] = React.useState("");
   const [selectedBigIdeas, setSelectedBigIdeas] = React.useState<any[]>([]);
+  const [mappedKvOptions, setMappedKvOptions] = React.useState<KvOption[]>(kvOptions);
 
   React.useEffect(() => {
     // อ่านข้อมูล Big Ideas ที่เลือกมา
@@ -38,6 +47,25 @@ const GenerateKVForm: React.FC = () => {
       const parsedData = JSON.parse(savedBigIdeas);
       setSelectedBigIdeas(parsedData.selectedTopics || []);
       console.log('Loaded selected Big Ideas:', parsedData.selectedTopics);
+      
+      // Map kvOptions กับ selectedData
+      if (parsedData.selectedTopics && parsedData.selectedTopics.length > 0) {
+        const updatedKvOptions = kvOptions.map((option, index) => {
+          const selectedIdea = parsedData.selectedTopics[index % parsedData.selectedTopics.length];
+          if (selectedIdea) {
+            return {
+              ...option,
+              title: `Idea ${index + 1}: ${selectedIdea.primaryText}`,
+              subtitle: selectedIdea.headline || option.subtitle,
+              desc: selectedIdea.description || option.desc,
+              bigIdeaData: selectedIdea // เก็บข้อมูล big idea เดิมไว้
+            };
+          }
+          return option;
+        });
+        setMappedKvOptions(updatedKvOptions);
+        console.log('Mapped KV Options:', updatedKvOptions);
+      }
     }
 
     // เช็คว่ามี Google AI API key หรือไม่
@@ -52,16 +80,19 @@ const GenerateKVForm: React.FC = () => {
   }, []);
 
   const generateAllImages = async (apiKey: string) => {
-    // สร้าง prompt จาก Big Ideas ที่เลือก
+    // สร้าง prompt จาก Big Ideas ที่เลือกและ mapped KV options
     const bigIdeaContext = selectedBigIdeas.length > 0 
       ? `Based on these selected big ideas: ${selectedBigIdeas.map(idea => `"${idea.primaryText}" - ${idea.description}`).join(', ')}. `
       : '';
 
-    const prompts = [
-      `${bigIdeaContext}Create a professional insurance advertisement image showing close and personal financial security. The image should convey trust, warmth, and everyday life protection for Thai insurance market.`,
-      `${bigIdeaContext}Create a professional insurance advertisement image showing family love and financial planning. The image should convey care, protection, and long-term planning for loved ones in Thai insurance market.`, 
-      `${bigIdeaContext}Create a professional insurance advertisement image showing freedom of choice and future planning. The image should convey empowerment, options, and control over one's financial future in Thai insurance market.`
-    ];
+    // สร้าง prompt สำหรับแต่ละไอเดียโดยใช้ mappedKvOptions
+    const prompts = mappedKvOptions.map((option, index) => {
+      const specificContext = option.bigIdeaData 
+        ? `Specifically for "${option.bigIdeaData.primaryText}" concept with "${option.subtitle}" theme. `
+        : '';
+      
+      return `${bigIdeaContext}${specificContext}Create a professional insurance advertisement image for "${option.title}". The image should convey the message: "${option.desc}". Style should be professional, trustworthy, and suitable for Thai insurance market.`;
+    });
 
     // สร้างภาพทั้ง 3 ภาพพร้อมกัน
     for (let i = 0; i < 3; i++) {
@@ -209,7 +240,7 @@ const GenerateKVForm: React.FC = () => {
             )}
           </div>
           <form className="flex gap-6">
-            {kvOptions.map((option, idx) => (
+            {mappedKvOptions.map((option, idx) => (
               <label key={idx} className="bg-white rounded-xl border border-[#E5E7EB] p-6 flex flex-col gap-2 w-1/3 cursor-pointer">
                 <input type="checkbox" className="accent-[#2563EB] mb-2" />
                 
@@ -238,6 +269,18 @@ const GenerateKVForm: React.FC = () => {
                 <div className="font-semibold text-[#1A202C] mb-1">{option.title}</div>
                 <div className="text-[#2563EB] text-sm mb-1">{option.subtitle}</div>
                 <div className="text-[#4B5563] text-sm mb-2">{option.desc}</div>
+                
+                {/* แสดงข้อมูล Big Idea ถ้ามี */}
+                {option.bigIdeaData && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-2">
+                    <div className="text-xs font-medium text-blue-800 mb-1">From Big Idea:</div>
+                    <div className="text-xs text-blue-700">{option.bigIdeaData.primaryText}</div>
+                    {option.bigIdeaData.hashtag && (
+                      <div className="text-xs text-blue-600 mt-1">{option.bigIdeaData.hashtag}</div>
+                    )}
+                  </div>
+                )}
+                
                 <div className="flex gap-2 mt-auto">
                   <span className="flex items-center gap-1 text-green-600 text-sm"><span>✔</span> Compliant data</span>
                   <span className="flex items-center gap-1 text-green-600 text-sm"><span>✔</span> CI data</span>
