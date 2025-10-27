@@ -1,11 +1,70 @@
 
 
+import { GoogleGenAI, Modality } from "@google/genai";
+import axios from "axios";
+
 // แยก response เป็น array เฉพาะ topic ที่ต้องการ
 export interface AdVersion {
   primaryText: string;
   headline: string;
   description: string;
   hashtag: string;
+}
+
+export async function generateImageWithGemini({
+  prompt,
+  apiKey
+}: {
+  prompt: string;
+  apiKey?: string;
+}) {
+  try {
+    const ai = new GoogleGenAI({
+      apiKey: apiKey || process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || ''
+    });
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-image",
+      contents: prompt,
+    });
+
+    console.log('Gemini response:', response);
+
+    // ตรวจสอบ candidates และ content parts
+    if (response.candidates && response.candidates.length > 0) {
+      const candidate = response.candidates[0];
+      
+      if (candidate.content && candidate.content.parts) {
+        for (const part of candidate.content.parts) {
+          if (part.inlineData && part.inlineData.data) {
+            const imageData = part.inlineData.data;
+            
+            // แปลง base64 เป็น data URL สำหรับแสดงใน browser
+            const dataUrl = `data:image/png;base64,${imageData}`;
+            
+            console.log('Generated image URL:', dataUrl);
+            
+            return {
+              imageUrl: dataUrl,
+              description: `Generated image for: ${prompt}`
+            };
+          } else if (part.text) {
+            console.log('Generated text:', part.text);
+          }
+        }
+      }
+    }
+    
+    throw new Error('No image data found in response');
+  } catch (error: unknown) {
+    console.error('Gemini AI image generation error:', error);
+    
+    // ส่งคืนภาพเริ่มต้น
+    return {
+      imageUrl: "/option1.jpg",
+      description: "Default insurance concept image (AI generation failed)"
+    };
+  }
 }
 
 export function extractTopics(response: string): AdVersion[] {
@@ -36,8 +95,6 @@ export function extractTopics(response: string): AdVersion[] {
 }
 // src/app/logics/ai.ts
 // Common utility for calling AI APIs (e.g. OpenAI, custom endpoints)
-
-import axios from "axios";
 
 export async function callChatGPT({
   product,
