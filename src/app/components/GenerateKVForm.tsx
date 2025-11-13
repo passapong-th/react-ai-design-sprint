@@ -91,7 +91,7 @@ const GenerateKVForm: React.FC = () => {
         ? `Specifically for "${option.bigIdeaData.primaryText}" concept with "${option.subtitle}" theme. `
         : '';
       
-      return `${bigIdeaContext}${specificContext}Create a professional insurance advertisement image for "${option.title}". The image should convey the message: "${option.desc}". Style should be professional, trustworthy, and suitable for Thai insurance market.`;
+      return `${bigIdeaContext}${specificContext}Create a professional bank advertisement image for "${option.title}". The image should convey the message: "${option.desc}". Style should be professional, trustworthy, and suitable for Thai banking market.`;
     });
 
     // สร้างภาพทั้ง 3 ภาพพร้อมกัน

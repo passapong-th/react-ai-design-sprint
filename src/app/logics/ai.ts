@@ -26,6 +26,12 @@ export async function generateImageWithGemini({
     // ปรับ prompt ให้ระบุชัดเจนว่าต้องการแค่รูปภาพ ไม่ต้องการข้อความ
     const imageOnlyPrompt = `${prompt}. Generate only an image without any text, labels, or written content. Create a pure visual representation.`;
 
+    console.log('=== Gemini Image Generation ===');
+    console.log('Original prompt:', prompt);
+    console.log('Enhanced prompt:', imageOnlyPrompt);
+    console.log('API Key:', apiKey ? `${apiKey.substring(0, 10)}...` : 'Not provided');
+    console.log('===============================');
+
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-image",
       contents: imageOnlyPrompt,
