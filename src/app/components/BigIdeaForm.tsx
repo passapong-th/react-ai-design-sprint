@@ -5,14 +5,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const BigIdeaForm: React.FC = () => {
-  const { topics } = React.useContext(TopicsContext);
+  const { topics, campaignName, setCampaignName } = React.useContext(TopicsContext);
   const [selectedTopics, setSelectedTopics] = React.useState<number[]>([]);
   const [additionalInput, setAdditionalInput] = React.useState("");
   const router = useRouter();
 
   React.useEffect(() => {
     console.log('BigIdeaForm topics:', topics);
-  }, [topics]);
+    
+    // โหลด campaign name จาก localStorage ถ้าไม่มีใน context
+    if (!campaignName) {
+      const savedCampaignName = localStorage.getItem('campaignName');
+      if (savedCampaignName) {
+        setCampaignName(savedCampaignName);
+      }
+    }
+  }, [topics, campaignName, setCampaignName]);
 
   const handleTopicSelection = (index: number) => {
     setSelectedTopics(prev => {
@@ -27,6 +35,7 @@ const BigIdeaForm: React.FC = () => {
   const handleNext = () => {
     // บันทึกข้อมูลที่เลือกลง localStorage
     const selectedData = {
+      campaignName: campaignName,
       selectedTopics: selectedTopics.map(index => topics[index]),
       additionalInput: additionalInput,
       timestamp: new Date().toISOString()
@@ -76,7 +85,9 @@ const BigIdeaForm: React.FC = () => {
         <section className="p-8 flex flex-col gap-6 w-full">
           <div className="mb-4">
             <h2 className="font-semibold text-xl text-[#2563EB] mb-2">AI Big Idea</h2>
-            <div className="text-lg font-semibold text-[#1A202C] mb-2">Campaign name : ประกันสะสมทรัพย์</div>
+            <div className="text-lg font-semibold text-[#1A202C] mb-2">
+              Campaign name : {campaignName || "Loading..."}
+            </div>
             <div className="text-[#2563EB] mb-2">เลือกไอเดียที่ชอบ (สามารถเลือกได้มากกว่า 1 ไอเดีย)</div>
           </div>
           <form className="flex flex-col gap-4">

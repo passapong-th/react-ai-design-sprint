@@ -8,24 +8,27 @@ import Link from "next/link";
 
 const CreateCampaignForm: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
-  const [product, setProduct] = React.useState("ประกันสะสมทรัพย์");
-  const [sellingPoint, setSellingPoint] = React.useState("คุ้มครองชีวิตและเงินออมระยะยาว");
-  const [objective, setObjective] = React.useState("เพิ่มยอดขายและ lead");
-  const [target, setTarget] = React.useState("W1 : Senior – Business Owner, W2 : Senior – Professional");
+  const [product, setProduct] = React.useState(""); // เปลี่ยนเป็นค่าว่างเพื่อให้ผู้ใช้กรอกเอง
+  const [sellingPoint, setSellingPoint] = React.useState("");
+  const [objective, setObjective] = React.useState("");
+  const [target, setTarget] = React.useState("");
   const [showApiKeyModal, setShowApiKeyModal] = React.useState(false);
   const [apiKey, setApiKey] = React.useState("");
   
   // เพิ่ม state variables สำหรับข้อมูลในฟอร์มทั้งหมด
-  const [campaignName, setCampaignName] = React.useState("โฆษณาประกันสะสมทรัพย์");
+  const [campaignName, setCampaignName] = React.useState("");
   const [customerTarget, setCustomerTarget] = React.useState("Ecosystem");
   const [ecosystem, setEcosystem] = React.useState("Wealth");
-  const [platforms, setPlatforms] = React.useState(["Facebook", "Instagram"]);
-  const [language, setLanguage] = React.useState("ไทย/อังกฤษ");
-  const [mandatory, setMandatory] = React.useState("Human-Readable: อัดแน่นควรสื่อและสาระตรงเน้น...");
+  const [subSegments, setSubSegments] = React.useState<string[]>([]);
+  const [platforms, setPlatforms] = React.useState<string[]>([]);
+  const [productContext, setProductContext] = React.useState("");
+  const [language, setLanguage] = React.useState("");
+  const [mandatory, setMandatory] = React.useState("");
   const [insight, setInsight] = React.useState("");
+  const [output, setOutput] = React.useState("");
   
   const router = useRouter();
-  const { setTopics } = React.useContext(TopicsContext);
+  const { setTopics, setCampaignName: setContextCampaignName } = React.useContext(TopicsContext);
 
   // เพิ่มฟังก์ชันจัดการ platforms
   const handlePlatformChange = (platform: string) => {
@@ -34,6 +37,17 @@ const CreateCampaignForm: React.FC = () => {
         return prev.filter(p => p !== platform);
       } else {
         return [...prev, platform];
+      }
+    });
+  };
+
+  // เพิ่มฟังก์ชันจัดการ sub segments
+  const handleSubSegmentChange = (segment: string) => {
+    setSubSegments(prev => {
+      if (prev.includes(segment)) {
+        return prev.filter(s => s !== segment);
+      } else {
+        return [...prev, segment];
       }
     });
   };
@@ -64,11 +78,27 @@ const CreateCampaignForm: React.FC = () => {
 
     setLoading(true);
     try {
+      console.log('=== CreateCampaignForm Data Before Sending ===');
+      console.log('product:', product);
+      console.log('sellingPoint:', sellingPoint);
+      console.log('objective:', objective);
+      console.log('target:', target);
+      console.log('campaignName:', campaignName);
+      console.log('customerTarget:', customerTarget);
+      console.log('ecosystem:', ecosystem);
+      console.log('subSegments:', subSegments);
+      console.log('platforms:', platforms);
+      console.log('productContext:', productContext);
+      console.log('language:', language);
+      console.log('mandatory:', mandatory);
+      console.log('insight:', insight);
+      console.log('============================================');
+      
       const response = await callChatGPT({
         product,
         selling_point: sellingPoint,
         objective,
-        target,
+        target: subSegments.join(", "), // ใช้ subSegments แทน target
         apiKey: currentApiKey,
         campaignName,
         customerTarget,
@@ -84,6 +114,11 @@ const CreateCampaignForm: React.FC = () => {
       const content = response?.choices?.[0]?.message?.content || "";
       const filtered = extractTopics(content);
       setTopics(filtered);
+      
+      // บันทึก campaign name ลง context และ localStorage
+      setContextCampaignName(campaignName);
+      localStorage.setItem('campaignName', campaignName);
+      
       router.push("/big-idea");
     } catch (err) {
       console.error("ChatGPT error:", err);
@@ -185,6 +220,7 @@ const CreateCampaignForm: React.FC = () => {
                   className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
                   value={campaignName} 
                   onChange={(e) => setCampaignName(e.target.value)}
+                  placeholder="เช่น โฆษณาประกันสะสมทรัพย์"
                 />
               </div>
               <div>
@@ -194,6 +230,7 @@ const CreateCampaignForm: React.FC = () => {
                   className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
                   value={product} 
                   onChange={(e) => setProduct(e.target.value)}
+                  placeholder="เช่น เที่ยวดีมีคืน, ประกันสะสมทรัพย์, บริการธนาคาร..."
                 />
               </div>
             </div>
@@ -266,23 +303,48 @@ const CreateCampaignForm: React.FC = () => {
               <h3 className="font-semibold text-lg mb-4 text-[#1A202C]">Ecosystem sub segment</h3>
               <div className="flex flex-col gap-2">
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" checked readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={subSegments.includes("W1 : Senior – Business Owner")}
+                    onChange={() => handleSubSegmentChange("W1 : Senior – Business Owner")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>W1 : Senior – Business Owner</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" checked readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={subSegments.includes("W2 : Senior – Professional")}
+                    onChange={() => handleSubSegmentChange("W2 : Senior – Professional")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>W2 : Senior – Professional</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" checked readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={subSegments.includes("W3 : Wealth – Business Owner")}
+                    onChange={() => handleSubSegmentChange("W3 : Wealth – Business Owner")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>W3 : Wealth – Business Owner</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" checked readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={subSegments.includes("W4 : Wealth – Professional")}
+                    onChange={() => handleSubSegmentChange("W4 : Wealth – Professional")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>W4 : Wealth – Professional</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" checked readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={subSegments.includes("W5 : Junior Wealth")}
+                    onChange={() => handleSubSegmentChange("W5 : Junior Wealth")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>W5 : Junior Wealth</span>
                 </label>
               </div>
@@ -344,7 +406,13 @@ const CreateCampaignForm: React.FC = () => {
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Product/Service context</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="ประกัน" readOnly />
+                <input 
+                  type="text" 
+                  className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
+                  value={productContext} 
+                  onChange={(e) => setProductContext(e.target.value)}
+                  placeholder="เช่น ประกัน, ธนาคาร, ท่องเที่ยว"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-red-600">Goals & Indication</label>
@@ -353,7 +421,7 @@ const CreateCampaignForm: React.FC = () => {
                   className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
                   value={objective} 
                   onChange={(e) => setObjective(e.target.value)}
-                  placeholder="เพิ่มยอดขายและ lead"
+                  placeholder="เช่น เพิ่มยอดขาย, สร้างตราประทับ, เพิ่ม lead"
                 />
               </div>
             </div>
@@ -403,12 +471,9 @@ const CreateCampaignForm: React.FC = () => {
               <label className="block text-sm font-medium mb-1 text-[#4B5563]">Output*</label>
               <textarea 
                 className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 h-32 text-sm" 
-                readOnly 
-                value={`บทบาทของคุณ: คุณคือ Creative & Performance Marketer ที่เชี่ยวชาญ Facebook/Instagram Ads และ Direct Response Copywriting พร้อมคิดคอนเซปต์ คอนเทนต์ และสคริปต์วิดีโอได้ครบถ้วน ตั้งเป้า Conversion/Lead/Message ตามที่กำหนด 
-
-1) บริบทแบรนด์/สินค้า ชื่อแบรนด์:ttb หมวดสินค้า/บริการ:${product} จุดขายหลัก (USP):${sellingPoint} วัตถุประสงค์แคมเปญ:${objective} กลุ่มเป้าหมาย:${target} 
-
-สิ่งที่ต้องการให้สร้าง (Output)โปรดส่งมอบ ชุดครีเอทีฟพร้อมยิงโฆษณา ดังนี้ ชุดคอนเทนต์โฆษณา (อย่างน้อย 5 เวอร์ชัน) สำหรับแต่ละเวอร์ชัน ให้มี:Primary Text (3 ความยาว):สั้น ≤125 ตัวอักษร (Hook ชัด อ่านจบในมือถือ)กลาง 125–220 ตัวอักษรยาว 221–500 ตัวอักษร Headline (3 แบบ): เน้นคมชัด แนะนำ ≤27 ตัวอักษรสำหรับมือถือ Description (1 แบบ): ≤30 ตัวอักษร (เสริมความเข้าใจ) อีโมจิ/ไอคอน: ใส่พอดี ช่วยอ่านง่าย (ถ้าเหมาะสม) แฮชแท็ก: 2–4 แท็ก (เน้นสื่อความ ไม่สแปม) สร้าง Hook แบบคำถาม, ตัวเลข, ข้อเปรียบเทียบ, ผลลัพธ์, ข้อท้าทาย, ข้อผิดพลาดที่พบบ่อย`}
+                value={output}
+                onChange={(e) => setOutput(e.target.value)}
+                placeholder="รูปแบบ output ที่ต้องการจาก AI"
               />
             </div>
             <div className="mb-4">
