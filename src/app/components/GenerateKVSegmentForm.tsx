@@ -117,6 +117,27 @@ const GenerateKVSegmentForm: React.FC = () => {
       setGeminiApiKey(savedApiKey);
     }
   }, []);
+  
+  // Auto-generate images when filtered segments change and API key is available
+  React.useEffect(() => {
+    const currentApiKey = geminiApiKey || localStorage.getItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY');
+    
+    if (filteredSegments.length > 0 && currentApiKey) {
+      // เริ่มสร้างรูปทั้งหมดอัตโนมัติ
+      filteredSegments.forEach((segment) => {
+        segment.options.forEach((option, optionIndex) => {
+          const imageKey = `${segment.name}_${optionIndex}`;
+          // เช็คว่ายังไม่ได้สร้างและไม่กำลังสร้าง
+          if (!generatedImages[imageKey] && !isGeneratingImages[imageKey]) {
+            generateImageForSegment(segment.name, option, optionIndex);
+          }
+        });
+      });
+    } else if (!currentApiKey && filteredSegments.length > 0) {
+      // แสดง modal ถ้าไม่มี API key
+      setShowGeminiApiKeyModal(true);
+    }
+  }, [filteredSegments, geminiApiKey, generatedImages, isGeneratingImages]);
 
   const handleOptionSelect = (segmentName: string, optionIndex: number) => {
     const optionId = `${segmentName}_${optionIndex}`;
@@ -164,6 +185,17 @@ const GenerateKVSegmentForm: React.FC = () => {
     if (geminiApiKey.trim()) {
       localStorage.setItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY', geminiApiKey.trim());
       setShowGeminiApiKeyModal(false);
+      // เริ่มสร้างรูปหลังจากบันทึก API key
+      setTimeout(() => {
+        filteredSegments.forEach((segment) => {
+          segment.options.forEach((option, optionIndex) => {
+            const imageKey = `${segment.name}_${optionIndex}`;
+            if (!generatedImages[imageKey] && !isGeneratingImages[imageKey]) {
+              generateImageForSegment(segment.name, option, optionIndex);
+            }
+          });
+        });
+      }, 100);
     }
   };
   return (
@@ -297,14 +329,12 @@ const GenerateKVSegmentForm: React.FC = () => {
                                 return <img src={generatedImage} alt="Generated" className="rounded-lg w-full h-full object-cover" />;
                               }
                               
+                              // แสดง loading ถ้ายังไม่มีรูปและไม่ได้เริ่มสร้างเลย
                               return (
-                                <button
-                                  onClick={() => generateImageForSegment(segment.name, option, oidx)}
-                                  className="text-center p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                                >
-                                  <div className="text-2xl mb-1">🖼️</div>
-                                  <div className="text-xs text-gray-600">สร้างรูป</div>
-                                </button>
+                                <div className="text-center">
+                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+                                  <div className="text-xs text-gray-500">เตรียมสร้าง...</div>
+                                </div>
                               );
                             })()}
                           </div>
