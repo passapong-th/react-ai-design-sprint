@@ -14,8 +14,29 @@ const CreateCampaignForm: React.FC = () => {
   const [target, setTarget] = React.useState("W1 : Senior – Business Owner, W2 : Senior – Professional");
   const [showApiKeyModal, setShowApiKeyModal] = React.useState(false);
   const [apiKey, setApiKey] = React.useState("");
+  
+  // เพิ่ม state variables สำหรับข้อมูลในฟอร์มทั้งหมด
+  const [campaignName, setCampaignName] = React.useState("โฆษณาประกันสะสมทรัพย์");
+  const [customerTarget, setCustomerTarget] = React.useState("Ecosystem");
+  const [ecosystem, setEcosystem] = React.useState("Wealth");
+  const [platforms, setPlatforms] = React.useState(["Facebook", "Instagram"]);
+  const [language, setLanguage] = React.useState("ไทย/อังกฤษ");
+  const [mandatory, setMandatory] = React.useState("Human-Readable: อัดแน่นควรสื่อและสาระตรงเน้น...");
+  const [insight, setInsight] = React.useState("");
+  
   const router = useRouter();
   const { setTopics } = React.useContext(TopicsContext);
+
+  // เพิ่มฟังก์ชันจัดการ platforms
+  const handlePlatformChange = (platform: string) => {
+    setPlatforms(prev => {
+      if (prev.includes(platform)) {
+        return prev.filter(p => p !== platform);
+      } else {
+        return [...prev, platform];
+      }
+    });
+  };
 
   React.useEffect(() => {
     // เช็คว่ามี API key หรือไม่
@@ -48,7 +69,14 @@ const CreateCampaignForm: React.FC = () => {
         selling_point: sellingPoint,
         objective,
         target,
-        apiKey: currentApiKey
+        apiKey: currentApiKey,
+        campaignName,
+        customerTarget,
+        ecosystem,
+        platforms,
+        language,
+        mandatory,
+        insight
       });
       
       console.log("ChatGPT response:", response);
@@ -152,7 +180,12 @@ const CreateCampaignForm: React.FC = () => {
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Campaign name*</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="โฆษณาประกันสะสมทรัพย์" readOnly />
+                <input 
+                  type="text" 
+                  className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
+                  value={campaignName} 
+                  onChange={(e) => setCampaignName(e.target.value)}
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-red-600">Product/Service</label>
@@ -167,11 +200,21 @@ const CreateCampaignForm: React.FC = () => {
             <div className="flex gap-6 items-center">
               <span className="text-sm font-medium text-[#4B5563]">Customer Target*</span>
               <label className="flex items-center gap-2">
-                <input type="radio" checked readOnly className="accent-[#2563EB]" />
+                <input 
+                  type="radio" 
+                  checked={customerTarget === "Ecosystem"} 
+                  onChange={() => setCustomerTarget("Ecosystem")}
+                  className="accent-[#2563EB]" 
+                />
                 <span>Ecosystem</span>
               </label>
               <label className="flex items-center gap-2">
-                <input type="radio" readOnly className="accent-[#2563EB]" />
+                <input 
+                  type="radio" 
+                  checked={customerTarget === "Non Ecosystem"}
+                  onChange={() => setCustomerTarget("Non Ecosystem")}
+                  className="accent-[#2563EB]" 
+                />
                 <span>Non Ecosystem</span>
               </label>
             </div>
@@ -182,19 +225,39 @@ const CreateCampaignForm: React.FC = () => {
               <h3 className="font-semibold text-lg mb-4 text-[#1A202C]">Ecosystem</h3>
               <div className="flex flex-col gap-2">
                 <label className="flex items-center gap-2">
-                  <input type="radio" checked readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="radio" 
+                    checked={ecosystem === "Wealth"} 
+                    onChange={() => setEcosystem("Wealth")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>Wealth</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="radio" readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="radio" 
+                    checked={ecosystem === "Home Owner"}
+                    onChange={() => setEcosystem("Home Owner")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>Home Owner</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="radio" readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="radio" 
+                    checked={ecosystem === "Car Owner"}
+                    onChange={() => setEcosystem("Car Owner")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>Car Owner</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="radio" readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="radio" 
+                    checked={ecosystem === "Salaryman"}
+                    onChange={() => setEcosystem("Salaryman")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>Salaryman</span>
                 </label>
               </div>
@@ -232,23 +295,48 @@ const CreateCampaignForm: React.FC = () => {
               <span className="text-sm font-medium text-[#4B5563]">Platform</span>
               <div className="flex gap-6 mt-2">
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" checked readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={platforms.includes("Facebook")} 
+                    onChange={() => handlePlatformChange("Facebook")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>Facebook</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" checked readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={platforms.includes("Instagram")} 
+                    onChange={() => handlePlatformChange("Instagram")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>Instagram</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={platforms.includes("Line")}
+                    onChange={() => handlePlatformChange("Line")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>Line</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={platforms.includes("Pop-up")}
+                    onChange={() => handlePlatformChange("Pop-up")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>Pop-up</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" readOnly className="accent-[#2563EB]" />
+                  <input 
+                    type="checkbox" 
+                    checked={platforms.includes("Pm Card")}
+                    onChange={() => handlePlatformChange("Pm Card")}
+                    className="accent-[#2563EB]" 
+                  />
                   <span>Pm Card</span>
                 </label>
               </div>
@@ -294,11 +382,21 @@ const CreateCampaignForm: React.FC = () => {
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Language</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="ไทย/อังกฤษ" readOnly />
+                <input 
+                  type="text" 
+                  className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
+                  value={language} 
+                  onChange={(e) => setLanguage(e.target.value)}
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-[#4B5563]">Mandatory</label>
-                <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" value="Human-Readable: อัดแน่นควรสื่อและสาระตรงเน้น..." readOnly />
+                <input 
+                  type="text" 
+                  className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
+                  value={mandatory} 
+                  onChange={(e) => setMandatory(e.target.value)}
+                />
               </div>
             </div>
             <div className="mb-4">
@@ -315,7 +413,13 @@ const CreateCampaignForm: React.FC = () => {
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1 text-[#4B5563]">Insight</label>
-              <input type="text" className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" placeholder="Description" readOnly />
+              <input 
+                type="text" 
+                className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
+                placeholder="Insight เพิ่มเติมสำหรับแคมเปญ" 
+                value={insight}
+                onChange={(e) => setInsight(e.target.value)}
+              />
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1 text-[#4B5563]">Upload</label>
