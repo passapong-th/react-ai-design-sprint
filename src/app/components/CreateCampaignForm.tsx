@@ -224,7 +224,7 @@ const CreateCampaignForm: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-red-600">Product/Service</label>
+                <label className="block text-sm font-medium mb-1 text-black">Product/Service</label>
                 <input 
                   type="text" 
                   className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
@@ -415,7 +415,7 @@ const CreateCampaignForm: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-red-600">Goals & Indication</label>
+                <label className="block text-sm font-medium mb-1 text-black">Goals & Indication</label>
                 <input 
                   type="text" 
                   className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
@@ -427,7 +427,7 @@ const CreateCampaignForm: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-6 mb-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-red-600">รายละเอียด sub-segment เพิ่มเติม</label>
+                <label className="block text-sm font-medium mb-1 text-black">รายละเอียด sub-segment เพิ่มเติม</label>
                 <input 
                   type="text" 
                   className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
@@ -437,7 +437,7 @@ const CreateCampaignForm: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-red-600">Mood and tone</label>
+                <label className="block text-sm font-medium mb-1 text-black">Mood and tone</label>
                 <input 
                   type="text" 
                   className="w-full border border-[#E5E7EB] rounded-lg px-3 py-2 text-black" 
