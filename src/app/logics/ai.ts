@@ -23,9 +23,12 @@ export async function generateImageWithGemini({
       apiKey: apiKey || process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || ''
     });
 
+    // ปรับ prompt ให้ระบุชัดเจนว่าต้องการแค่รูปภาพ ไม่ต้องการข้อความ
+    const imageOnlyPrompt = `${prompt}. Generate only an image without any text, labels, or written content. Create a pure visual representation.`;
+
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-image",
-      contents: prompt,
+      contents: imageOnlyPrompt,
     });
 
     console.log('Gemini response:', response);
@@ -48,9 +51,8 @@ export async function generateImageWithGemini({
               imageUrl: dataUrl,
               description: `Generated image for: ${prompt}`
             };
-          } else if (part.text) {
-            console.log('Generated text:', part.text);
           }
+          // ลบส่วนที่ log text output เพื่อไม่ให้มีข้อความปะปน
         }
       }
     }
