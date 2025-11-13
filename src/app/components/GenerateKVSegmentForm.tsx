@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 
@@ -80,6 +81,42 @@ const segments = [
 ];
 
 const GenerateKVSegmentForm: React.FC = () => {
+  const [selectedSubSegments, setSelectedSubSegments] = React.useState<string[]>([]);
+  const [filteredSegments, setFilteredSegments] = React.useState(segments);
+  const [selectedOptions, setSelectedOptions] = React.useState<string[]>([]);
+  
+  React.useEffect(() => {
+    // โหลดข้อมูล sub-segments ที่เลือกจาก localStorage
+    const savedSubSegments = localStorage.getItem('selectedSubSegments');
+    if (savedSubSegments) {
+      try {
+        const parsed = JSON.parse(savedSubSegments);
+        setSelectedSubSegments(parsed);
+        
+        // กรองเฉพาะ segments ที่ถูกเลือก
+        const filtered = segments.filter(segment => 
+          parsed.includes(segment.name)
+        );
+        setFilteredSegments(filtered);
+        
+        console.log('Selected sub-segments:', parsed);
+        console.log('Filtered segments:', filtered);
+      } catch (error) {
+        console.error('Error parsing selected sub-segments:', error);
+      }
+    }
+  }, []);
+
+  const handleOptionSelect = (segmentName: string, optionIndex: number) => {
+    const optionId = `${segmentName}_${optionIndex}`;
+    setSelectedOptions(prev => {
+      if (prev.includes(optionId)) {
+        return prev.filter(id => id !== optionId);
+      } else {
+        return [...prev, optionId];
+      }
+    });
+  };
   return (
     <div className="flex min-h-screen bg-[#F7FAFC]">
       {/* Sidebar */}
@@ -122,34 +159,82 @@ const GenerateKVSegmentForm: React.FC = () => {
             <input type="text" className="border border-[#E5E7EB] rounded-lg px-3 py-2 w-full mb-2" value="Option 1+2" readOnly />
           </div>
           <div className="mb-4">
-            <h3 className="font-semibold text-lg text-[#1A202C] mb-2">5 Segments</h3>
-            {segments.map((segment, idx) => (
-              <div key={idx} className="mb-8">
-                <div className="font-semibold text-[#2563EB] mb-1">{segment.name} <span className="text-[#4B5563] font-normal text-sm">{segment.desc}</span></div>
-                <div className="flex gap-6">
-                  {segment.options.map((option, oidx) => (
-                    <label key={oidx} className="bg-white rounded-xl border border-[#E5E7EB] p-6 flex flex-col gap-2 w-1/2 cursor-pointer">
-                      <input type="checkbox" className="accent-[#2563EB] mb-2" />
-                      <div className="flex gap-2 items-start mb-2">
-                        <img src={segment.images[oidx]} alt="Image" className="rounded-lg w-32 h-32 object-cover" />
-                        <div>
-                          <div className="font-semibold text-[#F59E42] mb-1">Headline</div>
-                          <div className="bg-[#F3F6FB] rounded-lg px-2 py-1 mb-2 text-[#1A202C] text-sm">{option.headline}</div>
-                          <div className="font-semibold text-[#F59E42] mb-1">Body Copy</div>
-                          <div className="bg-[#F3F6FB] rounded-lg px-2 py-1 text-[#4B5563] text-sm">{option.body}</div>
-                        </div>
-                      </div>
-                    </label>
+            <h3 className="font-semibold text-lg text-[#1A202C] mb-2">
+              {filteredSegments.length > 0 ? `${filteredSegments.length} Selected Segments` : '5 Segments'}
+            </h3>
+            {selectedSubSegments.length > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <div className="text-sm font-medium text-blue-800 mb-2">Selected Sub-Segments from Create Campaign Form:</div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedSubSegments.map((segment, index) => (
+                    <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                      {segment}
+                    </span>
                   ))}
+                </div>
+              </div>
+            )}
+            {filteredSegments.length === 0 && (
+              <div className="text-[#F59E42] text-sm mb-4">
+                ไม่มี sub-segments ที่เลือก กรุณากลับไปเลือก sub-segments ในหน้า Create Campaign Form
+              </div>
+            )}
+            {filteredSegments.map((segment, idx) => (
+              <div key={idx} className="mb-8">
+                <div className="font-semibold text-[#2563EB] mb-1 flex items-center gap-2">
+                  <span>{segment.name}</span>
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Selected</span>
+                  <span className="text-[#4B5563] font-normal text-sm">{segment.desc}</span>
+                </div>
+                <div className="flex gap-6">
+                  {segment.options.map((option, oidx) => {
+                    const optionId = `${segment.name}_${oidx}`;
+                    return (
+                      <label key={oidx} className="bg-white rounded-xl border border-[#E5E7EB] p-6 flex flex-col gap-2 w-1/2 cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="accent-[#2563EB] mb-2" 
+                          checked={selectedOptions.includes(optionId)}
+                          onChange={() => handleOptionSelect(segment.name, oidx)}
+                        />
+                        <div className="flex gap-2 items-start mb-2">
+                          <img src={segment.images[oidx]} alt="Image" className="rounded-lg w-32 h-32 object-cover" />
+                          <div>
+                            <div className="font-semibold text-[#F59E42] mb-1">Headline</div>
+                            <div className="bg-[#F3F6FB] rounded-lg px-2 py-1 mb-2 text-[#1A202C] text-sm">{option.headline}</div>
+                            <div className="font-semibold text-[#F59E42] mb-1">Body Copy</div>
+                            <div className="bg-[#F3F6FB] rounded-lg px-2 py-1 text-[#4B5563] text-sm">{option.body}</div>
+                          </div>
+                        </div>
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
             ))}
           </div>
           <div className="flex justify-between mt-6">
-            <Link href="/generate-kv-result">
+            <Link href="/generate-kv">
               <button className="bg-[#F3F6FB] text-[#2563EB] px-8 py-2 rounded-lg font-semibold text-lg">Previous</button>
             </Link>
-            <button className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg">Next</button>
+            <button 
+              className="bg-[#2563EB] text-white px-8 py-2 rounded-lg font-semibold text-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled={selectedOptions.length === 0}
+              onClick={() => {
+                // บันทึกข้อมูลที่เลือกลง localStorage
+                const selectedKVData = {
+                  selectedSubSegments: selectedSubSegments,
+                  selectedOptions: selectedOptions,
+                  timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('selectedKVOptions', JSON.stringify(selectedKVData));
+                console.log('Selected KV options saved:', selectedKVData);
+                // Navigate to next page (ใส่ตาม flow ของคุณ)
+                alert(`Selected ${selectedOptions.length} KV options!`);
+              }}
+            >
+              Next ({selectedOptions.length} selected)
+            </button>
           </div>
         </section>
       </main>

@@ -115,9 +115,10 @@ const CreateCampaignForm: React.FC = () => {
       const filtered = extractTopics(content);
       setTopics(filtered);
       
-      // บันทึก campaign name ลง context และ localStorage
+      // บันทึก campaign name และ sub-segments ลง context และ localStorage
       setContextCampaignName(campaignName);
       localStorage.setItem('campaignName', campaignName);
+      localStorage.setItem('selectedSubSegments', JSON.stringify(subSegments));
       
       router.push("/big-idea");
     } catch (err) {
