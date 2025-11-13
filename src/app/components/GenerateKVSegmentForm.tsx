@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { generateImageWithGemini } from "../logics/ai";
 
 const segments = [
   {
@@ -84,6 +85,10 @@ const GenerateKVSegmentForm: React.FC = () => {
   const [selectedSubSegments, setSelectedSubSegments] = React.useState<string[]>([]);
   const [filteredSegments, setFilteredSegments] = React.useState(segments);
   const [selectedOptions, setSelectedOptions] = React.useState<string[]>([]);
+  const [generatedImages, setGeneratedImages] = React.useState<{[key: string]: string}>({});
+  const [isGeneratingImages, setIsGeneratingImages] = React.useState<{[key: string]: boolean}>({});
+  const [showGeminiApiKeyModal, setShowGeminiApiKeyModal] = React.useState(false);
+  const [geminiApiKey, setGeminiApiKey] = React.useState("");
   
   React.useEffect(() => {
     // โหลดข้อมูล sub-segments ที่เลือกจาก localStorage
@@ -105,6 +110,12 @@ const GenerateKVSegmentForm: React.FC = () => {
         console.error('Error parsing selected sub-segments:', error);
       }
     }
+    
+    // เช็คว่ามี Gemini API key หรือไม่
+    const savedApiKey = localStorage.getItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY');
+    if (savedApiKey) {
+      setGeminiApiKey(savedApiKey);
+    }
   }, []);
 
   const handleOptionSelect = (segmentName: string, optionIndex: number) => {
@@ -117,8 +128,77 @@ const GenerateKVSegmentForm: React.FC = () => {
       }
     });
   };
+  
+  const generateImageForSegment = async (segmentName: string, option: any, optionIndex: number) => {
+    const currentApiKey = geminiApiKey || localStorage.getItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY');
+    
+    if (!currentApiKey) {
+      setShowGeminiApiKeyModal(true);
+      return;
+    }
+    
+    const imageKey = `${segmentName}_${optionIndex}`;
+    setIsGeneratingImages(prev => ({ ...prev, [imageKey]: true }));
+    
+    try {
+      // สร้าง prompt สำหรับ segment และ option นี้
+      const prompt = `Create a professional Thai bank advertisement image for "${option.headline}". Target audience: ${segmentName}. Message concept: "${option.body}". Style should be modern, trustworthy, and appealing to Thai bank market. No text overlay or written content in the image. Focus on visual elements, symbols, and imagery that convey trust and financial security.`;
+      
+      const result = await generateImageWithGemini({
+        prompt: prompt,
+        apiKey: currentApiKey
+      });
+      
+      if (result && result.imageUrl) {
+        setGeneratedImages(prev => ({ ...prev, [imageKey]: result.imageUrl }));
+        console.log(`Generated image for ${segmentName} option ${optionIndex}:`, result);
+      }
+    } catch (error) {
+      console.error(`Failed to generate image for ${segmentName} option ${optionIndex}:`, error);
+    } finally {
+      setIsGeneratingImages(prev => ({ ...prev, [imageKey]: false }));
+    }
+  };
+  
+  const handleSaveGeminiApiKey = () => {
+    if (geminiApiKey.trim()) {
+      localStorage.setItem('NEXT_PUBLIC_GOOGLE_AI_API_KEY', geminiApiKey.trim());
+      setShowGeminiApiKeyModal(false);
+    }
+  };
   return (
     <div className="flex min-h-screen bg-[#F7FAFC]">
+      {/* Gemini API Key Modal */}
+      {showGeminiApiKeyModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Enter Google AI API Key</h2>
+            <p className="text-gray-600 mb-6">Please enter your Google AI API key to generate images with Gemini.</p>
+            <input
+              type="password"
+              value={geminiApiKey}
+              onChange={(e) => setGeminiApiKey(e.target.value)}
+              placeholder="Your Google AI API Key"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-black mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={handleSaveGeminiApiKey}
+                disabled={!geminiApiKey.trim()}
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setShowGeminiApiKeyModal(false)}
+                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-[#E5E7EB] flex flex-col py-6 px-4">
         <div className="flex items-center gap-2 mb-8">
@@ -198,7 +278,36 @@ const GenerateKVSegmentForm: React.FC = () => {
                           onChange={() => handleOptionSelect(segment.name, oidx)}
                         />
                         <div className="flex gap-2 items-start mb-2">
-                          <img src={segment.images[oidx]} alt="Image" className="rounded-lg w-32 h-32 object-cover" />
+                          <div className="w-32 h-32 rounded-lg border border-gray-200 flex flex-col items-center justify-center bg-gray-50">
+                            {(() => {
+                              const imageKey = `${segment.name}_${oidx}`;
+                              const isGenerating = isGeneratingImages[imageKey];
+                              const generatedImage = generatedImages[imageKey];
+                              
+                              if (isGenerating) {
+                                return (
+                                  <div className="text-center">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+                                    <div className="text-xs text-gray-500">กำลังสร้าง...</div>
+                                  </div>
+                                );
+                              }
+                              
+                              if (generatedImage) {
+                                return <img src={generatedImage} alt="Generated" className="rounded-lg w-full h-full object-cover" />;
+                              }
+                              
+                              return (
+                                <button
+                                  onClick={() => generateImageForSegment(segment.name, option, oidx)}
+                                  className="text-center p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                                >
+                                  <div className="text-2xl mb-1">🖼️</div>
+                                  <div className="text-xs text-gray-600">สร้างรูป</div>
+                                </button>
+                              );
+                            })()}
+                          </div>
                           <div>
                             <div className="font-semibold text-[#F59E42] mb-1">Headline</div>
                             <div className="bg-[#F3F6FB] rounded-lg px-2 py-1 mb-2 text-[#1A202C] text-sm">{option.headline}</div>
